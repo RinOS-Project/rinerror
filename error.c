@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: MIT */
+#define RINERROR_LEGACY_NAMES 1
 #include "include/rinerror/error.h"
 
 #include <errno.h>
