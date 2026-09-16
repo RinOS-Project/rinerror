@@ -76,6 +76,11 @@ static void initialize_error(uint16_t domain, int64_t code,
     output->reserved = 0u;
 }
 
+static void clear_error(RinErrorV1* output)
+{
+    if (output != NULL) *output = (RinErrorV1){0};
+}
+
 static uint32_t kind_from_errno(int error_number)
 {
     switch (error_number) {
@@ -201,6 +206,7 @@ int rin_error_from_status(uint16_t domain, int64_t code, uint32_t flags,
 {
     uint32_t kind;
     if (output == NULL) return RIN_ERROR_STATUS_INVALID_ARGUMENT;
+    clear_error(output);
     if (!domain_valid(domain)) return RIN_ERROR_STATUS_BAD_DOMAIN;
     if (!flags_valid(flags)) return RIN_ERROR_STATUS_BAD_FLAGS;
     if (code == 0) kind = RIN_ERROR_SUCCESS;
@@ -231,7 +237,10 @@ int rin_error_from_code(uint16_t domain, int64_t code, RinErrorV1* output)
 
 int rin_error_from_errno(int error_number, RinErrorV1* output)
 {
-    if (error_number < 0) return RIN_ERROR_STATUS_INVALID_ARGUMENT;
+    if (error_number < 0) {
+        clear_error(output);
+        return RIN_ERROR_STATUS_INVALID_ARGUMENT;
+    }
     return rin_error_from_status(RIN_ERROR_DOMAIN_ERRNO, error_number, 0u,
                                  output);
 }
